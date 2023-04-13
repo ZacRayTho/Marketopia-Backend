@@ -40,3 +40,17 @@ class MessageWriteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model =  Message
         fields = '__all__'
+
+# ------------------REVIEW SERIALIZERS--------------------------------------------------
+
+class ReviewReadSerializer(serializers.HyperlinkedModelSerializer):
+    seller = serializers.StringRelatedField()
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+class ReviewWriteSerializer(serializers.HyperlinkedModelSerializer):
+    seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    class Meta:
+        model = Review
+        fields = '__all__'

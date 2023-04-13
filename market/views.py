@@ -27,6 +27,8 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+# ------------------MESSAGE VIEWS--------------------------------------------------
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
 
@@ -35,3 +37,14 @@ class MessageViewSet(viewsets.ModelViewSet):
             return MessageReadSerializer
         else:
             return MessageWriteSerializer
+
+# ------------------REVIEW VIEWS--------------------------------------------------
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ReviewReadSerializer
+        else:
+            return ReviewWriteSerializer
