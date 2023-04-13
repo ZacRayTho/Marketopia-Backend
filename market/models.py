@@ -18,3 +18,17 @@ class Review(models.Model):
     # limit the integerField on the front end to only allow 1-5
     rating = models.IntegerField()
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='seller')
+
+# class Listing(models.Model):
+#     title = models.CharField(max_length=80)
+#     description = models.TextField()
+#     print = models.IntegerField()
+#     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+#     location = models.ForeignKey('Location', on_delete=models.PROTECT, related_name='listing')
+
+class Image(models.Model):
+    pic = models.URLField()
+    # owner = models.ForeignKey('Listing', on_delete=models.CASCADE, related_name='Image')
+
+class Location(models.Model):
+    name = models.CharField(max_length=50)

@@ -6,6 +6,8 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register(r'messages', MessageViewSet)
 router.register(r'reviews', ReviewViewSet)
+router.register(r'images', ImageViewSet)
+router.register(r'locations', LocationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

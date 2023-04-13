@@ -54,3 +54,17 @@ class ReviewWriteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+# ------------------IMAGE SERIALIZERS--------------------------------------------------
+
+class ImageReadSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Image
+        fields = '__all__'
+
+# ------------------LOCATION SERIALIZERS--------------------------------------------------
+
+class LocationReadSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'

@@ -48,3 +48,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return ReviewReadSerializer
         else:
             return ReviewWriteSerializer
+
+# ------------------IMAGE VIEWS--------------------------------------------------
+
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageReadSerializer
+
+# ------------------LOCATION VIEWS--------------------------------------------------
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationReadSerializer
