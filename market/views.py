@@ -5,8 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from .models import CustomUser
+from rest_framework import mixins
 
-from .serializers import CustomUserSerializer
+from .serializers import *
 
 class UserCreate(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -26,3 +27,11 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return MessageReadSerializer
+        else:
+            return MessageWriteSerializer
