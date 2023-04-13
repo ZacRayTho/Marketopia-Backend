@@ -37,3 +37,15 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.gitpod\.io$",
 ]
 ```
+I haven’t figured out a way to deploy the project with the nested structure so we’re pulling the project/app directories out into the root of the project with the manage.py
+
+The command that you run to do that is the django-admin startproject api .. You will not need to do anything extra. That is just a little different than what we've done in the past.
+
+|- api/ (aka your project)
+|- app/
+|- manage.py
+|- main.py
+|- .env
+|- .gcloudignore
+|- .gitignore
+|- app.yaml
