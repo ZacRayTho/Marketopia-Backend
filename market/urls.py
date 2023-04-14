@@ -8,6 +8,9 @@ router.register(r'messages', MessageViewSet)
 router.register(r'reviews', ReviewViewSet)
 router.register(r'images', ImageViewSet)
 router.register(r'locations', LocationViewSet)
+router.register(r'listings', ListingViewSet)
+router.register(r'categories', CategoryViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),

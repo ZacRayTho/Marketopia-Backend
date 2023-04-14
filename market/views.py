@@ -60,3 +60,20 @@ class ImageViewSet(viewsets.ModelViewSet):
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationReadSerializer
+
+# ------------------LISTING VIEWS--------------------------------------------------
+
+class ListingViewSet(viewsets.ModelViewSet):
+    queryset = Listing.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ListingReadSerializer
+        else:
+            return ListingWriteSerializer
+
+# ------------------REVIEW VIEWS--------------------------------------------------
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategoryReadSerializer

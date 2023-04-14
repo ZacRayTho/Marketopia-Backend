@@ -68,3 +68,33 @@ class LocationReadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'
+
+# ------------------LISTING SERIALIZERS--------------------------------------------------
+
+class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
+    seller = serializers.StringRelatedField()
+    location = serializers.StringRelatedField()
+    category = serializers.StringRelatedField(many=True)
+    image = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Listing
+        fields = '__all__'
+
+class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
+    seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
+    image = serializers.PrimaryKeyRelatedField(queryset=Image.objects.all(), many=True)
+
+    
+    class Meta:
+        model = Listing
+        fields = '__all__'
+
+# ------------------CATEGORY SERIALIZERS--------------------------------------------------
+
+class CategoryReadSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
