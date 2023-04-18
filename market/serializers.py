@@ -9,12 +9,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True
     )
-    username = serializers.CharField()
+    # username = serializers.CharField()
     password = serializers.CharField(min_length=8, write_only=True)
     
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password', 'first_name', 'last_name')
+        fields = ('email', 'password', 'first_name', 'last_name')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -75,7 +75,7 @@ class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.StringRelatedField()
     location = serializers.StringRelatedField()
     category = serializers.StringRelatedField(many=True)
-    image = serializers.StringRelatedField(many=True)
+    Image = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Listing
@@ -83,15 +83,27 @@ class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
 
 class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
-    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    location = LocationReadSerializer()
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
-    image = serializers.PrimaryKeyRelatedField(queryset=Image.objects.all(), many=True)
+    Image = serializers.PrimaryKeyRelatedField(queryset=Image.objects.all(), many=True)
 
     
     class Meta:
         model = Listing
         fields = '__all__'
 
+    def create(self, validated_data):
+        location_data = validated_data.pop('location')
+        location_id = location_data.get('id')
+        if location_id:
+            location = Location.objects.get(pk=location_id)
+            location_serializer = LocationReadSerializer(instance=location, data=location_data)
+            location_serializer.is_valid(raise_exception=True)
+            location_serializer.save()
+        else:
+            location = Location.objects.create(**location_data)
+        listing = Listing.objects.create(location=location, **validated_data)
+        return listing
 # ------------------CATEGORY SERIALIZERS--------------------------------------------------
 
 class CategoryReadSerializer(serializers.HyperlinkedModelSerializer):

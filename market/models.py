@@ -1,11 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 # Create your models here.
 class CustomUser(AbstractUser):
-    pass
+    username = None
+    email = models.EmailField(_("email address"), unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ()
 
     def __str__(self):
-        return self.username
+        return str(self.email)
+
+    class Meta(AbstractUser.Meta):
+        ordering = ["-date_joined"]
+        db_table = "users"
 
 class Message(models.Model):
     text = models.TextField()
@@ -24,18 +33,23 @@ class Listing(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-    location = models.ForeignKey('Location', on_delete=models.PROTECT, related_name='listing')
+    location = models.ForeignKey('Location', on_delete=models.SET_NULL, related_name='listing', null=True)
     category = models.ManyToManyField('Category')
     
 class Image(models.Model):
     pic = models.URLField()
     owner = models.ForeignKey('Listing', on_delete=models.CASCADE, related_name='Image', default=1)
 
+    def __str__(self):
+        return self.pic
+
 class Location(models.Model):
-    name = models.CharField(max_length=50)
+    city = models.CharField(max_length=100, default="Something")
+    state = models.CharField(max_length=100, default="Went Wrong")
+    zip = models.IntegerField(default="0")
 
     def __str__(self):
-        return self.name
+        return self.city + ", " + self.state
 
 class Category(models.Model):
     name = models.CharField(max_length=80)
