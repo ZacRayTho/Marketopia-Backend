@@ -79,12 +79,11 @@ class LocationViewSet(viewsets.ModelViewSet):
             headers={'Content-Type': 'application/json'}
         )
         data = res.json()
-        return JsonResponse(data)
+        # return JsonResponse(data)
         # Retrieve address components from request data
-        city = data["results"][0]["address_components"][1]["short_name"]
-        state = data["results"][0]["address_components"][2]["short_name"]
+        city = next((component["long_name"] for component in data["results"][0]["address_components"] if "locality" in component["types"]), None)
+        state = next((component["long_name"] for component in data["results"][0]["address_components"] if "administrative_area_level_1" in component["types"]), None)
         zip = request.data['zip']
-
         # Check if address is already in database
         if not Location.objects.filter(city=city, state=state, zip=zip).exists():
             # If address is not in database, create a new Address object
@@ -98,19 +97,19 @@ class LocationViewSet(viewsets.ModelViewSet):
             return Response({'success': False, 'message': 'Address already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
 # @csrf_exempt
-def create_location(request):
-    if request.method == 'POST':
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        zip = request.POST.get('zip')
+# def create_location(request):
+#     if request.method == 'POST':
+#         city = request.POST.get('city')
+#         state = request.POST.get('state')
+#         zip = request.POST.get('zip')
 
 
 
-        # Use get_or_create() to check if a Location object with the given data already exists
-        location, created = Location.objects.get_or_create(city=city, state=state, zip=zip)
+#         # Use get_or_create() to check if a Location object with the given data already exists
+#         location, created = Location.objects.get_or_create(city=city, state=state, zip=zip)
 
-        # Return a JSON response with the Location object data
-        return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip})
+#         # Return a JSON response with the Location object data
+#         return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip})
 # ------------------LISTING VIEWS--------------------------------------------------
 
 class ListingViewSet(viewsets.ModelViewSet):
