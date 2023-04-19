@@ -67,15 +67,19 @@ if APPENGINE_URL:
     ]
     SECURE_SSL_REDIRECT = True
 else:
-    CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://*.gitpod.io']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://*.gitpod.io', 'https://maps.googleapis.com']
     CORS_ALLOW_ALL_ORIGINS = True
 
+# ALLOWED_HOSTS = ['localhost', '*.gitpod.io', 'maps.googleapis.com']
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.gitpod\.io$",
     r"^https://.*\.web\.app$",
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'market.CustomUser'
 
@@ -177,7 +181,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': False,

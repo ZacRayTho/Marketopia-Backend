@@ -60,26 +60,33 @@ class ReviewWriteSerializer(serializers.HyperlinkedModelSerializer):
 class ImageReadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Image
-        fields = '__all__'
+        fields = ['id', 'pic']
 
 # ------------------LOCATION SERIALIZERS--------------------------------------------------
 
 class LocationReadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Location
-        fields = '__all__'
+        fields = ['id', 'city', 'state', 'zip']
+
+# ------------------CATEGORY SERIALIZERS--------------------------------------------------
+
+class CategoryReadSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
 
 # ------------------LISTING SERIALIZERS--------------------------------------------------
 
 class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.StringRelatedField()
     location = serializers.StringRelatedField()
-    category = serializers.StringRelatedField(many=True)
+    category = CategoryReadSerializer(many=True)
     Image = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Listing
-        fields = '__all__'
+        fields = ['id', 'seller', 'location', 'category', 'Image', 'description', 'price', 'title']
 
 class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
@@ -104,9 +111,3 @@ class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
             location = Location.objects.create(**location_data)
         listing = Listing.objects.create(location=location, **validated_data)
         return listing
-# ------------------CATEGORY SERIALIZERS--------------------------------------------------
-
-class CategoryReadSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
