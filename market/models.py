@@ -19,7 +19,8 @@ class CustomUser(AbstractUser):
 class Message(models.Model):
     text = models.TextField()
     viewed = models.BooleanField()
-    date_time_sent = models.TimeField()
+    date_time_sent = models.BigIntegerField()
+    timestamp = models.CharField(max_length=50, default="bad")
     sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='sender')
     recipient = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='recipient')
 
@@ -35,6 +36,9 @@ class Listing(models.Model):
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, related_name='listing', null=True)
     category = models.ManyToManyField('Category')
+
+    def __str__(self):
+        return f"{self.seller}'s {self.title}"
     
 class Image(models.Model):
     pic = models.URLField()

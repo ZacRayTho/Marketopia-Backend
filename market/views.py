@@ -10,6 +10,9 @@ from rest_framework import mixins
 from django.views.decorators.csrf import csrf_exempt
 import requests
 import environ
+from django.db.models import Q
+
+
 env = environ.Env()
 
 from .serializers import *
@@ -43,6 +46,12 @@ class MessageViewSet(viewsets.ModelViewSet):
         else:
             return MessageWriteSerializer
 
+class MessageList(APIView):
+    def get(self, request, sender_id, recipient_id):
+        messages = Message.objects.filter(Q(sender_id=sender_id, recipient_id=recipient_id) | Q(sender_id=recipient_id, recipient_id=sender_id)).order_by('date_time_sent')
+        serializer = MessageWriteSerializer(messages, many=True)
+        return Response(serializer.data)
+
 # ------------------REVIEW VIEWS--------------------------------------------------
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -58,7 +67,30 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
-    serializer_class = ImageReadSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ImageReadSerializer
+        else:
+            return ImageWriteSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Save the object and get its ID
+        self.perform_create(serializer)
+        obj_id = serializer.instance.pk
+        
+        headers = self.get_success_headers(serializer.data)
+        
+        # Return the ID in the response
+        response_data = {
+            'id': obj_id,
+            **serializer.data,
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
 # ------------------LOCATION VIEWS--------------------------------------------------
 
@@ -85,31 +117,10 @@ class LocationViewSet(viewsets.ModelViewSet):
         state = next((component["long_name"] for component in data["results"][0]["address_components"] if "administrative_area_level_1" in component["types"]), None)
         zip = request.data['zip']
         # Check if address is already in database
-        if not Location.objects.filter(city=city, state=state, zip=zip).exists():
-            # If address is not in database, create a new Address object
-            serializer = self.get_serializer(data={ "city": city, "state": state, "zip": zip })
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        else:
-            # If address already exists in database, return error response
-            return Response({'success': False, 'message': 'Address already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-# @csrf_exempt
-# def create_location(request):
-#     if request.method == 'POST':
-#         city = request.POST.get('city')
-#         state = request.POST.get('state')
-#         zip = request.POST.get('zip')
+        location, created = Location.objects.get_or_create(city=city, state=state, zip=zip)
+        return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip})
 
-
-
-#         # Use get_or_create() to check if a Location object with the given data already exists
-#         location, created = Location.objects.get_or_create(city=city, state=state, zip=zip)
-
-#         # Return a JSON response with the Location object data
-#         return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip})
 # ------------------LISTING VIEWS--------------------------------------------------
 
 class ListingViewSet(viewsets.ModelViewSet):

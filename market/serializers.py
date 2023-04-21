@@ -25,6 +25,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class UserReadSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model =  CustomUser
+        fields = ['id', 'first_name', 'last_name']
+
 # ------------------MESSAGE SERIALIZERS--------------------------------------------------
 
 class MessageReadSerializer(serializers.HyperlinkedModelSerializer):
@@ -39,7 +45,10 @@ class MessageWriteSerializer(serializers.HyperlinkedModelSerializer):
     recipient = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
     class Meta:
         model =  Message
-        fields = '__all__'
+        fields = ['text', 'viewed', 'date_time_sent', 'timestamp', 'sender', 'recipient']
+
+
+
 
 # ------------------REVIEW SERIALIZERS--------------------------------------------------
 
@@ -58,9 +67,18 @@ class ReviewWriteSerializer(serializers.HyperlinkedModelSerializer):
 # ------------------IMAGE SERIALIZERS--------------------------------------------------
 
 class ImageReadSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.StringRelatedField()
+
     class Meta:
         model = Image
-        fields = ['id', 'pic']
+        fields = ['id', 'pic', 'owner']
+
+class ImageWriteSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(queryset=Listing.objects.all())
+
+    class Meta:
+        model = Image
+        fields = ['id', 'pic', 'owner']
 
 # ------------------LOCATION SERIALIZERS--------------------------------------------------
 
@@ -79,7 +97,7 @@ class CategoryReadSerializer(serializers.HyperlinkedModelSerializer):
 # ------------------LISTING SERIALIZERS--------------------------------------------------
 
 class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
-    seller = serializers.StringRelatedField()
+    seller = UserReadSerializer()
     location = serializers.StringRelatedField()
     category = CategoryReadSerializer(many=True)
     Image = serializers.StringRelatedField(many=True)
@@ -90,24 +108,11 @@ class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
 
 class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
-    location = LocationReadSerializer()
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
-    Image = serializers.PrimaryKeyRelatedField(queryset=Image.objects.all(), many=True)
+    # Image = serializers.PrimaryKeyRelatedField(queryset=Image.objects.all(), many=True)
 
     
     class Meta:
         model = Listing
-        fields = '__all__'
-
-    def create(self, validated_data):
-        location_data = validated_data.pop('location')
-        location_id = location_data.get('id')
-        if location_id:
-            location = Location.objects.get(pk=location_id)
-            location_serializer = LocationReadSerializer(instance=location, data=location_data)
-            location_serializer.is_valid(raise_exception=True)
-            location_serializer.save()
-        else:
-            location = Location.objects.create(**location_data)
-        listing = Listing.objects.create(location=location, **validated_data)
-        return listing
+        fields = ['id', 'seller', 'location', 'category', 'description', 'price', 'title']
