@@ -63,6 +63,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             return ReviewWriteSerializer
 
+class ReviewFetch(APIView):
+    def get(self, request, reviewer, seller):
+        review = Review.objects.filter(Q(reviewer=reviewer, seller=seller))
+        serializer = ReviewWriteSerializer(review, many=True)
+        return Response(serializer.data)
+
 # ------------------IMAGE VIEWS--------------------------------------------------
 
 class ImageViewSet(viewsets.ModelViewSet):

@@ -53,17 +53,20 @@ class MessageWriteSerializer(serializers.HyperlinkedModelSerializer):
 # ------------------REVIEW SERIALIZERS--------------------------------------------------
 
 class ReviewReadSerializer(serializers.HyperlinkedModelSerializer):
-    seller = serializers.StringRelatedField()
+    seller = UserReadSerializer()
+    reviewer = UserReadSerializer()
+
     class Meta:
         model = Review
         fields = '__all__'
 
 class ReviewWriteSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    reviewer = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
     class Meta:
         model = Review
-        fields = '__all__'
-
+        fields = ['id', 'seller', 'rating', 'reviewer']
+# MAKE CHANGES ON FRONT END TO GRAB THIS AND UPDATE THE POST REQUEST TO A PATCH IF THIS RETURNS SOMETHING
 # ------------------IMAGE SERIALIZERS--------------------------------------------------
 
 class ImageReadSerializer(serializers.HyperlinkedModelSerializer):

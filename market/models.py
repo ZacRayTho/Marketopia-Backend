@@ -28,6 +28,7 @@ class Review(models.Model):
     # limit the integerField on the front end to only allow 1-5
     rating = models.IntegerField()
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='seller')
+    reviewer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='reviewer', default=1)
 
 class Listing(models.Model):
     title = models.CharField(max_length=80)
