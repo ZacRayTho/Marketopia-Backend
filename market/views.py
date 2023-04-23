@@ -10,7 +10,7 @@ from rest_framework import mixins
 from django.views.decorators.csrf import csrf_exempt
 import requests
 import environ
-from django.db.models import Q
+from django.db.models import Q, F, Max
 
 
 env = environ.Env()
@@ -50,6 +50,18 @@ class MessageList(APIView):
     def get(self, request, sender_id, recipient_id):
         messages = Message.objects.filter(Q(sender_id=sender_id, recipient_id=recipient_id) | Q(sender_id=recipient_id, recipient_id=sender_id)).order_by('date_time_sent')
         serializer = MessageWriteSerializer(messages, many=True)
+        return Response(serializer.data)
+
+class UserChats(APIView):
+    def get(self, request, user_id):
+        # Get a list of users with whom the current user has communicated
+        messages_sent = Message.objects.filter(sender_id=user_id).values('recipient_id').distinct()
+        messages_received = Message.objects.filter(recipient_id=user_id).values('sender_id').distinct()
+        user_ids = set(messages_sent.values_list('recipient_id', flat=True)) | set(messages_received.values_list('sender_id', flat=True))
+        users = CustomUser.objects.filter(id__in=user_ids)
+
+        # Serialize the user ids
+        serializer = UserReadSerializer(users, many=True)
         return Response(serializer.data)
 
 # ------------------REVIEW VIEWS--------------------------------------------------

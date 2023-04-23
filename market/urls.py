@@ -18,5 +18,6 @@ urlpatterns = [
     path('user/login/', jwt_views.TokenObtainPairView.as_view(), name='token_create'),  # override sjwt stock token
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('message_list/<int:sender_id>/<int:recipient_id>/', MessageList.as_view(), name='message_list'),
+    path('chat_list/<int:user_id>/', UserChats.as_view(), name='user_chats'),
     path('review_fetch/<int:reviewer>/<int:seller>/', ReviewFetch.as_view(), name='review'),
 ]
