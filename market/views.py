@@ -133,11 +133,71 @@ class LocationViewSet(viewsets.ModelViewSet):
         # Retrieve address components from request data
         city = next((component["long_name"] for component in data["results"][0]["address_components"] if "locality" in component["types"]), None)
         state = next((component["long_name"] for component in data["results"][0]["address_components"] if "administrative_area_level_1" in component["types"]), None)
+        latitude = data["results"][0]["geometry"]["location"]["lat"]
+        longitude = data["results"][0]["geometry"]["location"]["lng"]
+        # print(latitude, longitude) 
         zip = request.data['zip']
         # Check if address is already in database
 
-        location, created = Location.objects.get_or_create(city=city, state=state, zip=zip)
-        return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip})
+        location, created = Location.objects.get_or_create(city=city, state=state, zip=zip, lat=latitude, long=longitude)
+        return JsonResponse({'id': location.id, 'city': location.city, 'state': location.state, 'zip_code': location.zip, 'lat': location.lat, 'long': location.long})
+
+class LocationRange(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationReadSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        def get_driving_distance(origin_lat, origin_lng, dest_lat, dest_lng, api_key):
+            url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+            params = {
+                "units": "imperial",
+                "origins": f"{origin_lat},{origin_lng}",
+                "destinations": f"{dest_lat},{dest_lng}",
+                "key": api_key
+            }
+            response = requests.get(url, params=params)
+            data = response.json()
+            if data["status"] == "OK":
+                distance = data["rows"][0]["elements"][0]["distance"]["value"]
+                return distance
+            else:
+                return None
+        # Get user's zip code and range
+        user_zip_code = request.data['zip']
+        user_range = int(request.data['range'])  # in miles
+
+        # Get user's location from their zip code
+        params = {
+            'address': user_zip_code,
+            'key': env("GOOGLE_MAPS_KEY"),
+        }
+        res = requests.get(
+            'https://maps.googleapis.com/maps/api/geocode/json',
+            params=params,
+            headers={'Content-Type': 'application/json'}
+        )
+        data = res.json()
+        user_lat = data["results"][0]["geometry"]["location"]["lat"]
+        user_lng = data["results"][0]["geometry"]["location"]["lng"]
+
+        # Loop through all the locations in your database
+        nearby_locations = []
+        for location in Location.objects.all():
+            # Calculate the driving distance between the user's location and the location in your database
+            distance = get_driving_distance(user_lat, user_lng, location.lat, location.long, env("GOOGLE_MAPS_KEY"))
+
+            # Convert the distance from meters to miles
+            distance = distance * 0.000621371
+
+            # Check if the location is within the user's range
+            if distance <= user_range:
+                # Add the location to the list of nearby locations
+                nearby_locations.append(location)
+
+        # Serialize and return the nearby locations
+        serializer = self.get_serializer(nearby_locations, many=True)
+        return Response(serializer.data)
 
 # ------------------LISTING VIEWS--------------------------------------------------
 

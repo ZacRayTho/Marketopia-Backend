@@ -52,6 +52,8 @@ class Location(models.Model):
     city = models.CharField(max_length=100, default="Something")
     state = models.CharField(max_length=100, default="Went Wrong")
     zip = models.IntegerField(default="0")
+    lat = models.FloatField(default="0")
+    long = models.FloatField(default="0")
 
     def __str__(self):
         return self.city + ", " + self.state

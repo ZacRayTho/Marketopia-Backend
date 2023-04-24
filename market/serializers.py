@@ -88,7 +88,7 @@ class ImageWriteSerializer(serializers.HyperlinkedModelSerializer):
 class LocationReadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Location
-        fields = ['id', 'city', 'state', 'zip']
+        fields = ['id', 'city', 'state', 'zip', 'lat', 'long']
 
 # ------------------CATEGORY SERIALIZERS--------------------------------------------------
 
