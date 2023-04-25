@@ -9,12 +9,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True
     )
+    saved = serializers.StringRelatedField(many=True)
     # username = serializers.CharField()
     password = serializers.CharField(min_length=8, write_only=True)
     
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'first_name', 'last_name', 'image')
+        fields = ('email', 'password', 'first_name', 'last_name', 'image', 'saved')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -26,10 +27,16 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return instance
 
 class UserReadSerializer(serializers.HyperlinkedModelSerializer):
-
+    saved = serializers.StringRelatedField(many=True)
     class Meta:
         model =  CustomUser
-        fields = ['id', 'first_name', 'last_name', 'image']
+        fields = ['id', 'first_name', 'last_name', 'image', 'saved']
+
+class UserWriteSerializer(serializers.HyperlinkedModelSerializer):
+    saved = serializers.PrimaryKeyRelatedField(queryset=Listing.objects.all(), many=True)
+    class Meta:
+        model =  CustomUser
+        fields = ['id', 'first_name', 'last_name', 'image', 'saved']
 
 # ------------------MESSAGE SERIALIZERS--------------------------------------------------
 
@@ -108,6 +115,9 @@ class ListingReadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Listing
         fields = ['id', 'seller', 'location', 'category', 'Image', 'description', 'price', 'title']
+
+    def __str__(self):
+        return f"{self.seller}'s {self.title}"
 
 class ListingWriteSerializer(serializers.HyperlinkedModelSerializer):
     seller = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())

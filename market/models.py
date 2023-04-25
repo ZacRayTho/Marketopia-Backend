@@ -40,7 +40,6 @@ class Listing(models.Model):
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, related_name='listing', null=True)
     category = models.ManyToManyField('Category')
     
-
     def __str__(self):
         return f"{self.seller}'s {self.title}"
     

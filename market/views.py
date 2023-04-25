@@ -35,6 +35,12 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+class UserPatch(generics.UpdateAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    queryset = CustomUser.objects.all()
+    serializer_class = UserWriteSerializer
+
+
 # ------------------MESSAGE VIEWS--------------------------------------------------
 
 class MessageViewSet(viewsets.ModelViewSet):
