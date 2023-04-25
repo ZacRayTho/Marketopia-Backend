@@ -5,7 +5,9 @@ from django.utils.translation import gettext_lazy as _
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
-
+    image = models.URLField(default="https://media.istockphoto.com/id/1074273158/vector/person-gray-photo-placeholder-man.jpg?s=612x612&w=0&k=20&c=OcUd-R2-sPpl33QVLuY9haUUAuvdlQK8XrkciaNFLO8=")
+    saved = models.ManyToManyField('Listing')
+    
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ()
 
@@ -37,6 +39,7 @@ class Listing(models.Model):
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, related_name='listing', null=True)
     category = models.ManyToManyField('Category')
+    
 
     def __str__(self):
         return f"{self.seller}'s {self.title}"

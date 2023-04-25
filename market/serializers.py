@@ -14,7 +14,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'first_name', 'last_name')
+        fields = ('email', 'password', 'first_name', 'last_name', 'image')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -29,7 +29,7 @@ class UserReadSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model =  CustomUser
-        fields = ['id', 'first_name', 'last_name']
+        fields = ['id', 'first_name', 'last_name', 'image']
 
 # ------------------MESSAGE SERIALIZERS--------------------------------------------------
 
