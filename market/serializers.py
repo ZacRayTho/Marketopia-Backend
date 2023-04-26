@@ -9,7 +9,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True
     )
-    saved = serializers.StringRelatedField(many=True)
+    serializers.PrimaryKeyRelatedField(queryset=Listing.objects.all(), many=True)
     # username = serializers.CharField()
     password = serializers.CharField(min_length=8, write_only=True)
     
@@ -27,7 +27,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return instance
 
 class UserReadSerializer(serializers.HyperlinkedModelSerializer):
-    saved = serializers.StringRelatedField(many=True)
+    saved = serializers.PrimaryKeyRelatedField(queryset=Listing.objects.all(), many=True)
     class Meta:
         model =  CustomUser
         fields = ['id', 'first_name', 'last_name', 'image', 'saved']
