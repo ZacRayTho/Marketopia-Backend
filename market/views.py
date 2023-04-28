@@ -34,7 +34,7 @@ class UserCreate(APIView):
 class UserDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
+    serializer_class = UserReadSerializer
 
 class UserPatch(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -125,6 +125,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         print(request.data['zip'])
+        print(settings.GOOGLE_MAPS_KEY)
         params = {
             'address': request.data['zip'],
             'key': settings.GOOGLE_MAPS_KEY,
@@ -155,6 +156,8 @@ class LocationRange(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
+        print("HERE WE GO")
+        print(settings.GOOGLE_MAPS_KEY)
         def get_driving_distance(origin_lat, origin_lng, dest_lat, dest_lng, api_key):
             url = "https://maps.googleapis.com/maps/api/distancematrix/json"
             params = {
