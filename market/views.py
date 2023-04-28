@@ -137,7 +137,7 @@ class LocationViewSet(viewsets.ModelViewSet):
             headers={'Content-Type': 'application/json'}
         )
         data = res.json()
-        # return JsonResponse(data)
+        return JsonResponse(data)
         # Retrieve address components from request data
         city = next((component["long_name"] for component in data["results"][0]["address_components"] if "locality" in component["types"]), None)
         state = next((component["long_name"] for component in data["results"][0]["address_components"] if "administrative_area_level_1" in component["types"]), None)
