@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -9,11 +10,11 @@ from .models import CustomUser
 from rest_framework import mixins
 from django.views.decorators.csrf import csrf_exempt
 import requests
-import environ
+# import environ
 from django.db.models import Q, F, Max
 
 
-env = environ.Env()
+# env = environ.Env()
 
 from .serializers import *
 
@@ -126,7 +127,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         print(request.data['zip'])
         params = {
             'address': request.data['zip'],
-            'key': env("GOOGLE_MAPS_KEY"),
+            'key': settings.GOOGLE_MAPS_KEY,
         }
 
         res = requests.get(
@@ -176,7 +177,7 @@ class LocationRange(viewsets.ModelViewSet):
         # Get user's location from their zip code
         params = {
             'address': user_zip_code,
-            'key': env("GOOGLE_MAPS_KEY"),
+            'key': settings.GOOGLE_MAPS_KEY,
         }
         res = requests.get(
             'https://maps.googleapis.com/maps/api/geocode/json',
@@ -191,7 +192,7 @@ class LocationRange(viewsets.ModelViewSet):
         nearby_locations = []
         for location in Location.objects.all():
             # Calculate the driving distance between the user's location and the location in your database
-            distance = get_driving_distance(user_lat, user_lng, location.lat, location.long, env("GOOGLE_MAPS_KEY"))
+            distance = get_driving_distance(user_lat, user_lng, location.lat, location.long, settings.GOOGLE_MAPS_KEY)
 
             # Convert the distance from meters to miles
             distance = distance * 0.000621371
