@@ -10,6 +10,7 @@ from .models import CustomUser
 from rest_framework import mixins
 from django.views.decorators.csrf import csrf_exempt
 import requests
+from .pusher import pusher_client
 # import environ
 from django.db.models import Q, F, Max
 
@@ -52,6 +53,17 @@ class MessageViewSet(viewsets.ModelViewSet):
             return MessageReadSerializer
         else:
             return MessageWriteSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        # print(request.data)
+        pusher_client.trigger('messages', 'new-message', request.data)
+        # Perform your action here after the item is created
+        # For example, you can access the created instance using response.data
+        created_instance = response.data
+        # Perform your desired action using the created_instance
+        
+        return response
 
 class MessageList(APIView):
     def get(self, request, sender_id, recipient_id):

@@ -79,6 +79,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'market.CustomUser'
@@ -134,7 +135,21 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 # Use django-environ to parse the connection string
-DATABASES = {"default": env.db()}
+# BELOW NEEDS UNCOMMENTED FOR PRODUCTION
+# DATABASES = {"default": env.db()}
+
+# below for testing only, NOT production
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+# 
 
 # If the flag as been set, configure to use proxy
 if os.getenv("USE_CLOUD_SQL_AUTH_PROXY", None):
